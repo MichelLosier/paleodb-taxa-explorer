@@ -17,13 +17,16 @@ class SearchBar extends React.Component {
     }
     
     handleRecordSelection = (oid) => {
-        this.setSearchResults([]);
+        this.setState({
+            value: '',
+            searchResults:[]
+        })
         this.props.onNodeSelect(oid);
     }
 
     searchForTaxa = (term) => {
         pdbClient.getTaxaByNameMatch(term).then((results)=>{
-            this.setSearchResults(results);
+            this.setSearchResults(results.records);
         })
     }
 
@@ -37,26 +40,31 @@ class SearchBar extends React.Component {
         this.setState({
             timeout: setTimeout(()=>{
                 this.searchForTaxa(term);
-            }, 2000)
+            }, 1000)
         })
     }
 
     handleChange = (evt) => {
+        this.setState({value: evt.target.value})
         clearTimeout(this.state.timeout);
         this.searchTimeout(evt.target.value);
     }
 
     render(){
+        const {searchResults, value} = this.state;
         return(
-            <div class="search-bar">
+            <div className="search-bar">
                 <input
-                    //value={this.state.value}
+                    value={value}
                     onChange={this.handleChange}
                 />
-                <SearchResults
-                    results={this.state.searchResults.records}
-                    onRecordSelect={this.handleRecordSelection}
-                />
+                {(searchResults.length > 0) ?
+                    (<SearchResults
+                        results={this.state.searchResults}
+                        onRecordSelect={this.handleRecordSelection}
+                    />) : null
+                }
+
             </div>
         )
     }

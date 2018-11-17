@@ -34,14 +34,31 @@ a {
 .search-results {
   width: 100%;
   max-height: 15rem;
-  overflow-y: scroll; }
+  overflow-y: scroll;
+  border: 2px solid #eee;
+  padding: 1px; }
   .search-results ul {
     list-style-type: none;
     padding: 0;
     margin: 0; }
     .search-results ul li {
-      padding: 1rem;
-      border: 1px solid #666;
-      border-top: none; }
-      .search-results ul li:first-child {
-        border-top: 1px solid #666; }
+      padding: 0;
+      border-bottom: 1px solid #eee; }
+      .search-results ul li:hover {
+        cursor: pointer;
+        background-color: #eee; }
+      .search-results ul li:last-child {
+        border-bottom: none; }
+
+.search-result {
+  width: 100%;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column; }
+  .search-result div.name {
+    padding: 0.25rem 0; }
+  .search-result div.taxa-rank {
+    padding: 0.25rem 0;
+    color: #666;
+    font-size: 0.75rem;
+    font-style: italic; }

@@ -1,5 +1,7 @@
 import React from 'react';
 
+import SearchResult from '../search-result/search-result.component';
+
 class SearchResults extends React.Component {
     constructor(){
         super();
@@ -18,7 +20,9 @@ class SearchResults extends React.Component {
                     key={record.oid}
                     onClick={()=>{this.handleClick(record.oid)}}
                 >
-                    {record.nam}
+                    <SearchResult
+                        record={record}
+                    />
                 </li>   
             )
 
