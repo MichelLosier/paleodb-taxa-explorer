@@ -1,0 +1,18 @@
+@import '../../stylesheets/variables';
+
+.search-result{
+    width:100%;
+    padding: 0.5rem;
+    display:flex;
+    flex-direction: column;
+    div.name{
+        padding: 0.25rem 0;
+    }
+    div.taxa-rank{
+        padding: 0.25rem 0;
+        color: $color-primary-grey;
+        font-size: 0.75rem;
+        font-style: italic;
+    }
+
+}

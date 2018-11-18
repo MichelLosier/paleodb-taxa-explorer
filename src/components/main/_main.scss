@@ -1,0 +1,12 @@
+@import '../../stylesheets/variables';
+
+.main {
+    min-height: 100vh;
+    min-width: 100vw;
+    background-color: $color-background-white;
+    .layout-container{
+        display:flex;
+        justify-content: space-around;
+    }
+
+}

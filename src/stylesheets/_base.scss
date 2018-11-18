@@ -1,0 +1,20 @@
+@import 'variables';
+
+.App {
+    font-size: 14px;
+    font-weight: lighter;
+}
+
+
+h1, 
+h2, 
+h3 {
+  letter-spacing: .1em;
+  font-weight:lighter;	
+}
+
+a {
+  color: $color-primary-grey;
+  cursor: pointer;
+  text-decoration:none;
+}
