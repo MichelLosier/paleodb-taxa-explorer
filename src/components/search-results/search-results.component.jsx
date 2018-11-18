@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import SearchResult from '../search-result/search-result.component';
 
@@ -7,8 +8,8 @@ class SearchResults extends React.Component {
         super();
     }
 
-    handleClick = (oid) => {
-        this.props.onRecordSelect(oid);
+    handleClick = (record) => {
+        this.props.onRecordSelect(record);
     }
 
     results = () => {
@@ -18,7 +19,7 @@ class SearchResults extends React.Component {
                 <li 
                     id={record.oid}
                     key={record.oid}
-                    onClick={()=>{this.handleClick(record.oid)}}
+                    onClick={()=>{this.handleClick(record)}}
                 >
                     <SearchResult
                         record={record}
@@ -42,5 +43,13 @@ class SearchResults extends React.Component {
         )
     }
 }
+
+SearchResults.propTypes = {
+    //handle selection of record
+    onRecordSelect: PropTypes.func,
+    //array of records from search query
+    results: PropTypes.array
+}
+
 
 export default SearchResults;

@@ -1,10 +1,12 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import SearchResults from '../search-results/search-results.component';
 
 import PaleodbClientService from '../../services/paleodbClient.service';
 
 const pdbClient = new PaleodbClientService();
+
 
 class SearchBar extends React.Component {
     constructor(){
@@ -16,12 +18,12 @@ class SearchBar extends React.Component {
         }
     }
     
-    handleRecordSelection = (oid) => {
+    handleRecordSelection = (record) => {
         this.setState({
             value: '',
             searchResults:[]
         })
-        this.props.onNodeSelect(oid);
+        this.props.onRecordSelect(record);
     }
 
     searchForTaxa = (term) => {
@@ -68,6 +70,11 @@ class SearchBar extends React.Component {
             </div>
         )
     }
+}
+
+SearchBar.propTypes = {
+    //handler for selection of record
+    onRecordSelect: PropTypes.func
 }
 
 export default SearchBar;
