@@ -1,5 +1,10 @@
 @import '../../stylesheets/variables';
 
 .taxonomy-tree-container{
-    
+    width: 100%;
+    height: 100vh;
+    svg{
+        height:inherit;
+        width:inherit;
+    }
 }
