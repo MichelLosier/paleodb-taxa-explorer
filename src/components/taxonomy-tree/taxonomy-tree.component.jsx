@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import {linkHorizontal} from 'd3-shape';
 import {tree, hierarchy} from 'd3-hierarchy';
 import * as d3 from 'd3';
 
-
+import {taxaRanks} from '../../constants/taxaRank.constants';
 
 class TaxonomyTree extends React.Component {
     constructor(){
@@ -29,50 +30,56 @@ class TaxonomyTree extends React.Component {
     }
 
     createTree = () => {
-        d3.selectAll("g#tree-group").remove()
+        d3.selectAll("g.node").remove()
+        d3.selectAll("path.link").remove()
 
         const {graph} = this.props;
-        console.log(`received graph ${JSON.stringify(graph)}`)
-        const graphNode = hierarchy(graph, (d) => {
-            return d.children
-        })
+        const root = hierarchy(graph)
 
-        const treeChart = tree();
-        treeChart.size([500,500]);
+        const treeLayout = tree()
+            .size([500,500]);
+        treeLayout(root);
+ 
+        const nodes = root.descendants();
+        const links = root.links();
 
-        const treeData = treeChart(graphNode).descendants();
-
-        d3.select("svg#taxonomy-tree")
-            .append("g")
-            .attr("id", "tree-group")
-            .selectAll("g")
-            .data(treeData)
+        //nodes
+        d3.select("g.nodes")          
+            .selectAll("g.node")
+            .data(nodes)
             .enter()
             .append("g")
             .attr("class", "node")
-            .attr("transform", d => `translate(${d.y},${d.x})`);
-        
-        d3.selectAll("g.node")
+            .attr("transform", d => `translate(${d.y},${d.x})`)
             .append("circle")
-            .attr("r", 10)
-            .style("fill", "white")
-            .style("stroke", "black")
+            .attr("r", 5)
 
+        //node name
         d3.selectAll("g.node")
             .append("text")
-            .style("text-anchor", "start")
-            .style("fill", "black")
+            .attr("class", "name")
+            .attr("dx", "12px")
+            .attr("dy", "5px")
             .text(d => d.data.name);
 
-        d3.select("#tree-group").selectAll("line")
-            .data(treeData.filter(d =>{ return d.parent}))
-            .enter().insert("line", "g")
-            .attr("x1", d => d.parent.y)
-            .attr("y1", d => d.parent.x)
-            .attr("x2", d => d.y)
-            .attr("y2", d => d.x)
-            .style("stroke", "black")
-            
+        //node rank
+        // d3.selectAll("g.node")
+        //     .append("text")
+        //     .attr("class", "rank")
+        //     .text(d => taxaRanks[d.data.rank])
+
+        //line connecting nodes
+        d3.select("g.links")
+            .selectAll("path.link")
+            .data(links)
+            .enter()
+            .append("path")
+            .attr("class", "link")
+            .attr("d", linkHorizontal()
+                .x(d => d.y)
+                .y(d => d.x)
+            );
+
     }
 
     render(){
@@ -80,6 +87,10 @@ class TaxonomyTree extends React.Component {
             <div className="taxonomy-tree-container">
                 {/*This exposes the node ref to the class as this.node */}
                 <svg id="taxonomy-tree" ref={node => this.node = node}>
+                    <g id="tree-group">
+                        <g className="links"></g>
+                        <g className="nodes"></g>
+                    </g>
                 </svg>
             </div>
         )
