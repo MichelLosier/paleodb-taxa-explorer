@@ -62,3 +62,24 @@ a {
     color: #666;
     font-size: 0.75rem;
     font-style: italic; }
+
+.taxonomy-tree-container {
+  width: 100%;
+  height: 100vh; }
+  .taxonomy-tree-container svg#taxonomy-tree {
+    height: inherit;
+    width: inherit; }
+    .taxonomy-tree-container svg#taxonomy-tree g#tree-group {
+      transform: translate(25%, 10%); }
+    .taxonomy-tree-container svg#taxonomy-tree g.node {
+      fill: white;
+      stroke: #666; }
+      .taxonomy-tree-container svg#taxonomy-tree g.node text {
+        text-anchor: start;
+        fill: #666; }
+        .taxonomy-tree-container svg#taxonomy-tree g.node text .rank {
+          font-style: italic;
+          font-weight: lighter; }
+    .taxonomy-tree-container svg#taxonomy-tree .link {
+      stroke: #8eac22;
+      fill: none; }

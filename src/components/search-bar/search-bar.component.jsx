@@ -1,10 +1,13 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import SearchResults from '../search-results/search-results.component';
 
 import PaleodbClientService from '../../services/paleodbClient.service';
+import {debounce} from '../../services/clientHelpers';
 
 const pdbClient = new PaleodbClientService();
+
 
 class SearchBar extends React.Component {
     constructor(){
@@ -12,16 +15,8 @@ class SearchBar extends React.Component {
         this.state = {
             value: '',
             searchResults:[],
-            timeout: null
         }
-    }
-    
-    handleRecordSelection = (oid) => {
-        this.setState({
-            value: '',
-            searchResults:[]
-        })
-        this.props.onNodeSelect(oid);
+        this.searchForTaxa = debounce(this.searchForTaxa, 1000);
     }
 
     searchForTaxa = (term) => {
@@ -29,6 +24,16 @@ class SearchBar extends React.Component {
             this.setSearchResults(results.records);
         })
     }
+    
+    handleRecordSelection = (record) => {
+        this.setState({
+            value: '',
+            searchResults:[]
+        })
+        this.props.onRecordSelect(record);
+    }
+
+
 
     setSearchResults = (results) => {
         this.setState({
@@ -36,18 +41,10 @@ class SearchBar extends React.Component {
         })
     }
 
-    searchTimeout = (term) => {
-        this.setState({
-            timeout: setTimeout(()=>{
-                this.searchForTaxa(term);
-            }, 1000)
-        })
-    }
 
     handleChange = (evt) => {
         this.setState({value: evt.target.value})
-        clearTimeout(this.state.timeout);
-        this.searchTimeout(evt.target.value);
+        this.searchForTaxa(evt.target.value);
     }
 
     render(){
@@ -68,6 +65,11 @@ class SearchBar extends React.Component {
             </div>
         )
     }
+}
+
+SearchBar.propTypes = {
+    //handler for selection of record
+    onRecordSelect: PropTypes.func
 }
 
 export default SearchBar;

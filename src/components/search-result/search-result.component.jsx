@@ -1,4 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import {taxaRanks} from '../../constants/taxaRank.constants';
 
 class SearchResult extends React.Component {
@@ -19,6 +21,10 @@ class SearchResult extends React.Component {
             </div>
         )
     }
+}
+
+SearchResult.propTypes = {
+    record: PropTypes.object
 }
 
 export default SearchResult;
