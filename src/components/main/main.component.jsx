@@ -17,35 +17,70 @@ class Main extends React.Component {
     }
 
     handleNodeSelect = (node) => {
-       this.createGraph(node).then((graph) => {
+       const _node = this.restructureNodes(node);
+       this.fetchChildNodes(_node).then((children) => {
+            const _children = this.restructureNodes(children);
+            const graph = this.createGraph(_node, _children);
             this.setState({
                 graph: graph,
                 selectedNode: node
             });
        })
-
     }
 
-    createGraph = (node) => {
-        const graph = {
-            id: node.oid,
-            name: node.nam,
-            rank: node.rnk,
-            children: [],
-        }
-        return pdbClient.getTaxaAllChildren(node.oid, 1).then((data) => {
-            graph.children = data.records.map((r) => {
-                return {
-                    id: r.oid,
-                    name: r.nam,
-                    rank: r.rnk,
-                    children:[],
-                }
-            })
-        }).then(() =>{
-            console.log(`create graph ${JSON.stringify(graph)}`)
-            return graph;
+    fetchChildNodes = (parent) => {
+        return pdbClient.getTaxaAllChildren(parent.id, 2).then((data) => {
+            const records = data.records;
+            const parentIndex = records.findIndex(r => r.oid == parent.oid);
+            
+            records.splice(parentIndex, 1);
+            return records;
         })
+    }
+
+    restructureNodes = (records) => {
+        if (Array.isArray(records)) {
+            return records.map((record) => {
+                return ({
+                    id: record.oid,
+                    name: record.nam,
+                    rank: record.rnk,
+                    parent: record.par,
+                    children: [],
+                })
+            })
+        } else if (records.id){
+            return records
+        } else {
+            return ({
+                id: records.oid,
+                name: records.nam,
+                rank: records.rnk,
+                parent: records.par,
+                children: [],
+            })
+        }
+    }
+
+    createGraph = (root, records) => {
+        const graph = root;
+        if (records.length < 1){
+            return graph;
+        }
+
+        //else we have more work to do. Find children of this node
+        for (let i = 0; i < records.length; i++) {
+            let record = records[i];
+
+            if (record.parent == root.id){
+                graph.children.push(record) 
+                records.splice(i,1); //reduce search field
+                record = this.createGraph(record, records);
+            }
+            
+        }
+
+        return graph;
     }
 
     render(){

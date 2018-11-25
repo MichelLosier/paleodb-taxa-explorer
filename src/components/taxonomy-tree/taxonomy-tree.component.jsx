@@ -35,13 +35,15 @@ class TaxonomyTree extends React.Component {
 
         const {graph} = this.props;
         const root = hierarchy(graph)
-
+        
+        const nodes = root.descendants();
+        const links = root.links();
+        console.log(nodes)
         const treeLayout = tree()
             .size([500,500]);
         treeLayout(root);
  
-        const nodes = root.descendants();
-        const links = root.links();
+
 
         //nodes
         d3.select("g.nodes")          
@@ -60,7 +62,7 @@ class TaxonomyTree extends React.Component {
             .attr("class", "name")
             .attr("dx", "12px")
             .attr("dy", "5px")
-            .text(d => d.data.name);
+            .text(d => `${d.data.name} (${taxaRanks[d.data.rank]})`);
 
         //node rank
         // d3.selectAll("g.node")
