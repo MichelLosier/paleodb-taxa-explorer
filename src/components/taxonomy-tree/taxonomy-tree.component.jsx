@@ -125,7 +125,7 @@ class TaxonomyTree extends React.Component {
     }
 
     findMaxOfProperty(key, objArray){
-        let maxValue = 0;
+        let maxValue = 1;//we dont want to return 0 values
         objArray.forEach((obj) => {
             let value = (Array.isArray(obj[key])) ? obj[key].length : obj[key]
             if (value > maxValue){
