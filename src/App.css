@@ -63,60 +63,58 @@ a {
     font-size: 0.75rem;
     font-style: italic; }
 
-.taxonomy-tree-container {
-  width: 100%;
-  height: fit-content; }
-  .taxonomy-tree-container svg#taxonomy-tree {
-    height: 200vh;
-    width: inherit; }
-    .taxonomy-tree-container svg#taxonomy-tree g#tree-group {
-      transform: translate(10%, 10%); }
-    .taxonomy-tree-container svg#taxonomy-tree g.node {
+.taxonomy-tree-container svg#taxonomy-tree {
+  height: inherit;
+  width: inherit; }
+  .taxonomy-tree-container svg#taxonomy-tree g#tree-group {
+    transform: translate(100px, 100px); }
+  .taxonomy-tree-container svg#taxonomy-tree g.node {
+    fill: white;
+    stroke: #666; }
+    .taxonomy-tree-container svg#taxonomy-tree g.node .img-box {
+      height: 54px;
+      width: 54px;
       fill: white;
-      stroke: #666; }
-      .taxonomy-tree-container svg#taxonomy-tree g.node .img-box {
-        height: 54px;
-        width: 54px;
-        fill: white;
-        stroke: #666;
-        transform: translate(0px, -27px); }
-      .taxonomy-tree-container svg#taxonomy-tree g.node .thumbnail {
-        height: 44px;
-        width: 44px;
-        transform: translate(5px, -22px); }
-      .taxonomy-tree-container svg#taxonomy-tree g.node .label-svg-container {
-        width: 150px;
-        height: 54px;
-        transform: translate(54px, -27px); }
-        .taxonomy-tree-container svg#taxonomy-tree g.node .label-svg-container div.label {
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          text-align: center;
-          height: 54px; }
-          .taxonomy-tree-container svg#taxonomy-tree g.node .label-svg-container div.label div {
-            margin: 0px;
-            color: #666;
-            width: 100px; }
-            .taxonomy-tree-container svg#taxonomy-tree g.node .label-svg-container div.label div.name {
-              font-weight: bold; }
-            .taxonomy-tree-container svg#taxonomy-tree g.node .label-svg-container div.label div.rank {
-              font-style: italic; }
-      .taxonomy-tree-container svg#taxonomy-tree g.node text {
-        text-anchor: start;
-        fill: #666;
-        transform: translate(64px, -5px); }
-        .taxonomy-tree-container svg#taxonomy-tree g.node text.rank {
-          transform: translate(64px, 10px);
-          font-style: italic;
-          stroke-width: 0.5; }
-      .taxonomy-tree-container svg#taxonomy-tree g.node rect.label-box {
-        height: 54px;
-        width: 150px;
-        fill: white;
-        stroke: #666;
-        transform: translate(54px, -27px); }
-    .taxonomy-tree-container svg#taxonomy-tree .link {
-      stroke: #8eac22;
-      fill: none; }
+      stroke: #666;
+      transform: translate(0px, -27px); }
+    .taxonomy-tree-container svg#taxonomy-tree g.node .thumbnail {
+      height: 44px;
+      width: 44px;
+      transform: translate(5px, -22px); }
+    .taxonomy-tree-container svg#taxonomy-tree g.node .label-svg-container {
+      width: 150px;
+      height: 54px;
+      transform: translate(54px, -27px); }
+      .taxonomy-tree-container svg#taxonomy-tree g.node .label-svg-container div.label {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        height: 54px; }
+        .taxonomy-tree-container svg#taxonomy-tree g.node .label-svg-container div.label div {
+          margin: 0px;
+          color: #666;
+          width: fit-content;
+          max-width: 150px; }
+          .taxonomy-tree-container svg#taxonomy-tree g.node .label-svg-container div.label div.name {
+            font-weight: bold; }
+          .taxonomy-tree-container svg#taxonomy-tree g.node .label-svg-container div.label div.rank {
+            font-style: italic; }
+    .taxonomy-tree-container svg#taxonomy-tree g.node text {
+      text-anchor: start;
+      fill: #666;
+      transform: translate(64px, -5px); }
+      .taxonomy-tree-container svg#taxonomy-tree g.node text.rank {
+        transform: translate(64px, 10px);
+        font-style: italic;
+        stroke-width: 0.5; }
+    .taxonomy-tree-container svg#taxonomy-tree g.node rect.label-box {
+      height: 54px;
+      width: 150px;
+      fill: white;
+      stroke: #666;
+      transform: translate(54px, -27px); }
+  .taxonomy-tree-container svg#taxonomy-tree .link {
+    stroke: #8eac22;
+    fill: none; }

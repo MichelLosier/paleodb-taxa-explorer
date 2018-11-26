@@ -98,7 +98,7 @@ class Main extends React.Component {
                         onRecordSelect={this.handleNodeSelect}
                     />
                 </div>
-                <div className="layout-container">
+                <div>
                     <TaxonomyTree
                         onNodeClick={this.handleNodeSelect}
                         selectedNode={selectedNode}

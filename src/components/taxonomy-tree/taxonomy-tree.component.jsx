@@ -56,7 +56,10 @@ class TaxonomyTree extends React.Component {
         console.log(nodeData)
         console.log(linkData)
 
+        d3.select('div.taxonomy-tree-container')
+            .attr('style', `width:${maxNodeDepth * 800}px;height:${maxNodeChildren * 175}px;`)
         //nodes
+
         const nodes = d3.select("g.nodes")          
             .selectAll("g.node")
             .data(nodeData)

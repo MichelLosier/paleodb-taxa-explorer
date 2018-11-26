@@ -1,13 +1,13 @@
 @import '../../stylesheets/variables';
 
 .taxonomy-tree-container{
-    width: 100%;
-    height: fit-content;
+    // width: 100vw;
+    // height: 100vh;
     svg#taxonomy-tree{
-        height:200vh;
+        height:inherit;
         width:inherit;
         g#tree-group{
-            transform: translate(10%,10%);
+            transform: translate(100px,100px);
         }
         g.node{
             fill: white;
@@ -38,7 +38,8 @@
                     div {
                         margin:0px;
                         color: $color-primary-grey;
-                        width:100px;
+                        width:fit-content;
+                        max-width:150px;
                         &.name{
                             font-weight:bold;
                         }
