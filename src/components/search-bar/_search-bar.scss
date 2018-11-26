@@ -5,6 +5,8 @@
         font-size: 1.5rem;
         height:2rem;
         width: 100%;
+        border: 1px solid $color-background-grey;
+        border-radius: 5px;
         &:focus{
             outline: none;
         }

@@ -20,6 +20,9 @@ a {
   .main .layout-container {
     display: flex;
     justify-content: space-around; }
+  .main .header {
+    text-align: center;
+    padding: 0 1rem; }
 
 .search-bar {
   width: 50%; }
@@ -27,7 +30,9 @@ a {
     margin: auto;
     font-size: 1.5rem;
     height: 2rem;
-    width: 100%; }
+    width: 100%;
+    border: 1px solid #eee;
+    border-radius: 5px; }
     .search-bar input:focus {
       outline: none; }
 
