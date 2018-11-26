@@ -39,6 +39,7 @@ class Main extends React.Component {
     }
 
     restructureNodes = (records) => {
+        const imgURL = `https://training.paleobiodb.org/data1.2/taxa/thumb.png?id=`
         if (Array.isArray(records)) {
             return records.map((record) => {
                 return ({
@@ -47,6 +48,7 @@ class Main extends React.Component {
                     rank: record.rnk,
                     parent: record.par,
                     children: [],
+                    img: `${imgURL}${record.img.split(':')[1]}`
                 })
             })
         } else if (records.id){
@@ -58,6 +60,7 @@ class Main extends React.Component {
                 rank: records.rnk,
                 parent: records.par,
                 children: [],
+                img: `${imgURL}${records.img.split(':')[1]}`
             })
         }
     }

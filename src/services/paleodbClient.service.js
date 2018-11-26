@@ -24,32 +24,32 @@ class PaleodbClientService{
     // https://training.paleobiodb.org/data1.2/taxa/list_doc.html
     // @rank int
     getAllTaxaByRank = (rank) => {
-        return this.baseRequest(`all_taxa&rank=${rank}`);
+        return this.baseRequest(`all_taxa&rank=${rank}&show=img`);
     }
 
     getTaxaByOID = (oid) => {
-        return this.baseRequest(`taxon_id=${oid}`);
+        return this.baseRequest(`taxon_id=${oid}&show=img`);
     }
 
     getTaxaParent = (oid) => {
-        return this.baseRequest(`taxon_id=${oid}&rel=parent`);
+        return this.baseRequest(`taxon_id=${oid}&rel=parent&show=img`);
     }
 
     getTaxaAllParents = (oid, depth) => {
-        return this.baseRequest(`taxon_id=${oid}&rel=all_parents&depth=${depth}`);
+        return this.baseRequest(`taxon_id=${oid}&rel=all_parents&depth=${depth}&show=img`);
     }
 
     getTaxaChildren = (oid) => {
-        return this.baseRequest(`taxon_id=${oid}&rel=children`);
+        return this.baseRequest(`taxon_id=${oid}&rel=children&show=img`);
     }
 
     getTaxaAllChildren = (oid, depth) => {
-        return this.baseRequest(`taxon_id=${oid}&rel=all_children&depth=${depth}`);
+        return this.baseRequest(`taxon_id=${oid}&rel=all_children&depth=${depth}&show=img`);
     }
 
     // https://training.paleobiodb.org/data1.2/general/taxon_names_doc.html
     getTaxaByNameMatch = (name) => {
-        return this.baseRequest(`match_name=${name}.`);
+        return this.baseRequest(`match_name=${name}.&show=img`);
     }
 
 }

@@ -30,58 +30,106 @@ class TaxonomyTree extends React.Component {
     }
 
     createTree = () => {
+        const labelBoxWidth = 204
+        const labelBoxHeight = 54;
+
+
+        //reset tree on component update
         d3.selectAll("g.node").remove()
         d3.selectAll("path.link").remove()
 
+        //create d3 graph model from graph data
         const {graph} = this.props;
         const root = hierarchy(graph)
         
-        const nodes = root.descendants();
-        const links = root.links();
-        console.log(nodes)
-        const treeLayout = tree()
-            .size([500,500]);
-        treeLayout(root);
- 
+        //create references links and nodes
+        const nodeData = root.descendants();
+        const linkData = root.links();
 
+        const maxNodeDepth = this.findMaxOfProperty('depth', nodeData)
+        const maxNodeChildren = this.findMaxOfProperty('children', nodeData)
+        console.log(`maxNodeDepth: ${maxNodeDepth}\nmaxNodeChildren: ${maxNodeChildren}`)
+        //generate tree
+        const treeLayout = tree()
+            .size([maxNodeChildren * 150, maxNodeDepth * 500]);
+        treeLayout(root);
+        console.log(nodeData)
+        console.log(linkData)
 
         //nodes
-        d3.select("g.nodes")          
+        const nodes = d3.select("g.nodes")          
             .selectAll("g.node")
-            .data(nodes)
-            .enter()
+            .data(nodeData)
+        const nodeEnter = nodes.enter()
             .append("g")
             .attr("class", "node")
             .attr("transform", d => `translate(${d.y},${d.x})`)
-            .append("circle")
-            .attr("r", 5)
+        
+        //circle for node
+        // nodeEnter.append("circle")
+        //     .attr("r", 5)
+        nodeEnter.append("rect")
+        .attr("class", "img-box")
 
-        //node name
-        d3.selectAll("g.node")
-            .append("text")
+        nodeEnter.append("image")
+        .attr("class", "thumbnail")
+        .attr("xlink:href", d => d.data.img)
+        
+        nodeEnter.append("rect")
+            .attr("class", "label-box")
+
+        // nodeEnter.append("text")
+        //     .attr("class", "name")
+        //     .text(d => `${d.data.name}`);
+
+        nodeEnter.append("foreignObject")
+            .attr("class", "label-svg-container")
+            .append("xhtml:div")
+            .attr("class", "label")
+            .attr("xmlns","http://www.w3.org/1999/xhtml")
+        
+        nodeEnter.select("div.label")
+            .append("xhtml:div")
             .attr("class", "name")
-            .attr("dx", "12px")
-            .attr("dy", "5px")
-            .text(d => `${d.data.name} (${taxaRanks[d.data.rank]})`);
-
-        //node rank
-        // d3.selectAll("g.node")
-        //     .append("text")
+            .attr("xmlns","http://www.w3.org/1999/xhtml")
+            .text(d => `${d.data.name}`);
+        
+        nodeEnter.select("div.label")
+            .append("xhtml:div")
+            .attr("class", "rank")
+            .attr("xmlns","http://www.w3.org/1999/xhtml")
+            .text(d => `${taxaRanks[d.data.rank]}`);
+            
+        // nodeEnter.append("text")
         //     .attr("class", "rank")
-        //     .text(d => taxaRanks[d.data.rank])
+        //     .text(d => `${taxaRanks[d.data.rank]}`);
 
-        //line connecting nodes
+
+        
+        //lines connecting nodes
         d3.select("g.links")
             .selectAll("path.link")
-            .data(links)
+            .data(linkData)
             .enter()
             .append("path")
             .attr("class", "link")
             .attr("d", linkHorizontal()
                 .x(d => d.y)
                 .y(d => d.x)
+                .source(d => ({x: d.source.x, y: d.source.y + labelBoxWidth}))//label offset
             );
 
+    }
+
+    findMaxOfProperty(key, objArray){
+        let maxValue = 0;
+        objArray.forEach((obj) => {
+            let value = (Array.isArray(obj[key])) ? obj[key].length : obj[key]
+            if (value > maxValue){
+                maxValue = value
+            }
+        })
+        return maxValue;
     }
 
     render(){
