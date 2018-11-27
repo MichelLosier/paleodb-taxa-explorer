@@ -20,8 +20,10 @@ class SearchBar extends React.Component {
     }
 
     searchForTaxa = (term) => {
-        pdbClient.getTaxaByNameMatch(term).then((results)=>{
-            this.setSearchResults(results.records);
+        pdbClient.getTaxaByNameMatch(term, 20).then((results)=>{
+            if (this.state.value == term){
+                this.setSearchResults(results.records);
+            }       
         })
     }
     
@@ -43,8 +45,9 @@ class SearchBar extends React.Component {
 
 
     handleChange = (evt) => {
-        this.setState({value: evt.target.value})
-        this.searchForTaxa(evt.target.value);
+        this.setState({value: evt.target.value}, () => {
+            this.searchForTaxa(this.state.value)
+        });
     }
 
     render(){

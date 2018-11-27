@@ -48,8 +48,8 @@ class PaleodbClientService{
     }
 
     // https://training.paleobiodb.org/data1.2/general/taxon_names_doc.html
-    getTaxaByNameMatch = (name) => {
-        return this.baseRequest(`match_name=${name}.&show=img`);
+    getTaxaByNameMatch = (name, limit) => {
+        return this.baseRequest(`match_name=${name}.&limit=${limit}&show=img`);
     }
 
 }

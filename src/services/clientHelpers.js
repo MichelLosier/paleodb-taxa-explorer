@@ -13,11 +13,11 @@ export const http = (request) => {
 }
 
 export const debounce = (fn, delay) => {
-    let timer = null;
+    let timeout;
     return function (...args) {
         const context = this;
-        timer && clearTimeout(timer);
-        timer = setTimeout(() => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
             fn.apply(context, args);
         }, delay);
     };
