@@ -3,8 +3,8 @@ import {http} from './clientHelpers';
 
 class PaleodbClientService{
     constructor(){
-        this.baseTaxaURL = 'https://training.paleobiodb.org/data1.2/taxa/list.json'
-        this.baseConfigURL = 'https://training.paleobiodb.org/data1.2/config.json'
+        this.baseTaxaURL = 'https://paleobiodb.org/data1.2/taxa/list.json'
+        this.baseConfigURL = 'https://paleobiodb.org/data1.2/config.json'
     
         this.baseGetHeaders = new Headers({
             'Content-Type': 'application/json'

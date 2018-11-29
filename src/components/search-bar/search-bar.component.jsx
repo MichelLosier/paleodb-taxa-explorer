@@ -46,7 +46,9 @@ class SearchBar extends React.Component {
 
     handleChange = (evt) => {
         this.setState({value: evt.target.value}, () => {
-            this.searchForTaxa(this.state.value)
+            if(this.state.value != ""){
+                this.searchForTaxa(this.state.value)
+            }
         });
     }
 

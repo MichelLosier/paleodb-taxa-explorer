@@ -39,7 +39,7 @@ class Main extends React.Component {
     }
 
     restructureNodes = (records) => {
-        const imgURL = `https://training.paleobiodb.org/data1.2/taxa/thumb.png?id=`
+        const imgURL = `https://paleobiodb.org/data1.2/taxa/thumb.png?id=`
         if (Array.isArray(records)) {
             return records.map((record) => {
                 return ({
