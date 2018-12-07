@@ -14,11 +14,13 @@ class SearchResults extends React.Component {
 
     results = () => {
         const {results} = this.props;
+        let count = -1;
         const recordList = results.map((record)=>{
+            count++
             return(
                 <li 
                     id={record.oid}
-                    key={record.oid}
+                    key={record.oid + "-" + count}
                     onClick={()=>{this.handleClick(record)}}
                 >
                     <SearchResult
