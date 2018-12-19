@@ -24,6 +24,20 @@
                 width: 44px;
                 transform: translate(5px, -22px)
             }
+            .show-children-button{
+                fill: white;
+                stroke: $color-primary-grey;
+                transform: translate(224px, 0px);
+                cursor:pointer;
+            }
+            text.show-children-text {
+                fill: $color-primary-grey;
+                stroke-width: 0.1;
+                transform: translate(216.25px, 6px);
+                font-size: 24px;
+                pointer-events: none;
+
+            }
             .label-svg-container{
                 width: 150px;
                 height: 54px;

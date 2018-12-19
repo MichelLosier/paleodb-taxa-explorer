@@ -29,6 +29,18 @@ class TaxonomyTree extends React.Component {
         }
     }
 
+    nodeHasHiddenChildren(node){
+        let children = node.data.children;
+        let childrenLen = children.length
+        let allChildrenHidden = () => {
+            let visibleChildren = children.filter((child) => {
+                return child.show
+            })
+            return visibleChildren.length == 0;
+        }
+        return( childrenLen  > 0 && allChildrenHidden())
+    }
+
     createTree = () => {
         const labelBoxWidth = 204
         const labelBoxHeight = 54;
@@ -40,11 +52,16 @@ class TaxonomyTree extends React.Component {
 
         //create d3 graph model from graph data
         const {graph} = this.props;
+        console.log(graph)
         const root = hierarchy(graph)
-        
+        console.log(`root: ${root}`)
         //create references links and nodes
-        const nodeData = root.descendants();
-        const linkData = root.links();
+        const nodeData = root.descendants().filter((node) => {
+            return node.data.show
+        });
+        const linkData = root.links().filter((link) => {
+            return link.target.data.show
+        });
 
         const maxNodeDepth = this.findMaxOfProperty('depth', nodeData)
         const maxNodeChildren = this.findMaxOfProperty('children', nodeData)
@@ -53,8 +70,8 @@ class TaxonomyTree extends React.Component {
         const treeLayout = tree()
             .size([maxNodeChildren * 150, maxNodeDepth * 500]);
         treeLayout(root);
-        console.log(nodeData)
-        console.log(linkData)
+        // console.log(nodeData)
+        // console.log(linkData)
 
         d3.select('div.taxonomy-tree-container')
             .attr('style', `width:${(maxNodeDepth * 800) + 100}px;height:${(maxNodeChildren * 175) + 100}px;`)
@@ -106,8 +123,18 @@ class TaxonomyTree extends React.Component {
         // nodeEnter.append("text")
         //     .attr("class", "rank")
         //     .text(d => `${taxaRanks[d.data.rank]}`);
+        nodeEnter.filter(this.nodeHasHiddenChildren)
+            .append('circle')
+            .attr("r", "15")
+            .attr("class", "show-children-button")
+            .on("click", (d) => {
+                this.props.onShowChildren(d.data)
+            })
 
-
+        nodeEnter.filter(this.nodeHasHiddenChildren)
+            .append('text')
+            .attr('class', 'show-children-text')
+            .text('+')
         
         //lines connecting nodes
         d3.select("g.links")
