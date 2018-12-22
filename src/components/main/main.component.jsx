@@ -18,16 +18,34 @@ class Main extends React.Component {
         }
     }
 
-    handleNodeSelect = (node) => {
-       const _node = taxaFactory(node);
-       this.fetchChildNodes(_node).then((children) => {
-            const _children = this.prepareChildNodes(_node, children)
-            const nodes = [..._children, _node];
-            this.setState({
-                nodes: nodes,
-                selectedNode: _node
-            });
-       })
+    handleNodeSelect = (node, resetNodes) => {
+        const {selectedNode} = this.state;
+        const _node = taxaFactory(node);
+
+        this.fetchChildNodes(_node).then((children) => {
+                const _children = this.prepareChildNodes(_node, children)
+                let nodes = [..._children, _node];
+
+                this.setState((prevState) => {
+                    if(!resetNodes){
+                        const nodesDeduplicated = nodes.filter((childNode) => {
+                            return (childNode.parent != selectedNode._id ) && (childNode._id != selectedNode._id)
+                        })
+                        nodes = [...nodesDeduplicated, ...prevState.nodes]
+                    }
+                    return {
+                        nodes: nodes,
+                        selectedNode: _node
+                    }
+                });
+        })
+    }
+
+    handleNewRoot = (node) => {
+        pdbClient.getTaxaByOID(node.parent).then((data) => {
+            const parent = data.records[0]
+            this.handleNodeSelect(parent)
+        })
     }
 
     handleShowChildren = (parent) => {
@@ -45,21 +63,25 @@ class Main extends React.Component {
     }
 
     //grab 1 extra child depth that will be hidden
-    fetchChildNodes = (parent) => {
+    fetchChildNodes = (parent, depth) => {
         return pdbClient.getTaxaAllChildren(parent._id, 2).then((data) => {
             const records = data.records;
             //filter out parent which is already known
             const parentIndex = records.findIndex(r => r.oid == parent._id);        
             records.splice(parentIndex, 1);
-            return records;
+            const _records = records.filter((record) => { //filter out subjective synonyms
+                return !record.tdf
+            })
+            return _records;
         })
     }
 
     //create Taxa objects out of records and hide children that are
     prepareChildNodes = (parent, children) => {
+        const {selectedNode} = this.state
         const _children = taxaFactory(children);
         return _children.map((child) => {
-            if (child.parent == parent._id){
+            if (child.parent == parent._id || child._id == selectedNode._id || child.parent == selectedNode._id){
                 child.show = true;
                 return child;
             } else {
@@ -68,40 +90,22 @@ class Main extends React.Component {
             }
         })
     }
-    //duplication happening somewhere
-    _createHierarchicalGraph = (root, nodes) => {
-        if (nodes.length < 1){
-            return root
-        }
-
-        //else we have more work to do. Find children of this node
-        for (let i = 0; i < nodes.length; i++) {
-            let node = Object.assign({},nodes[i]);
-            // if (node._id == root._id){
-            //     continue;
-            // }
-            if (node.parent == root._id){
-                nodes.splice(i,1);
-                let child = this.createHierarchicalGraph(node, nodes);
-                root.children.push(child);
-                console.log(`nodes length: ${nodes.length}`)
-                console.log(`root: ${root._id} ${root.name} added child: ${child._id} ${child.name}`)
-            } 
-        }
-        return this.createHierarchicalGraph(root, nodes);
-    }
+    
 
     createHierarchicalGraph = (root, nodes) => {
-       
-        root = this.findChildren(root, nodes);
-        return root;
+        console.log(root)
+        let _root = Object.assign({}, root);
+        const _nodes = [...nodes];
+
+        _root = this.findChildren(_root, _nodes);
+        return _root;
     }
 
     findChildren = (root, nodes) => {
         root.children=[];
         for (let i = 0; i < nodes.length; i++) {
             let node = Object.assign({},nodes[i]);
-
+            node.children = []
             if (node.parent == root._id && node._id != root._id){
                 let child = this.findChildren(node, nodes);
                 root.children.push(child)
@@ -125,6 +129,7 @@ class Main extends React.Component {
                 <div>
                     <TaxonomyTree
                         onNodeClick={this.handleNodeSelect}
+                        onNewRoot={this.handleNewRoot}
                         onShowChildren={this.handleShowChildren}
                         selectedNode={selectedNode}
                         graph={this.createHierarchicalGraph(selectedNode, nodes)}

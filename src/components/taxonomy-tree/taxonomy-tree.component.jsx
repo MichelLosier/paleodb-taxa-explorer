@@ -41,6 +41,10 @@ class TaxonomyTree extends React.Component {
         return( childrenLen  > 0 && allChildrenHidden())
     }
 
+    nodeIsRootAndHasParent = (node) => {
+        return node.data.parent && (node.data._id == this.props.selectedNode._id)
+    }
+
     createTree = () => {
         const labelBoxWidth = 204
         const labelBoxHeight = 54;
@@ -52,9 +56,9 @@ class TaxonomyTree extends React.Component {
 
         //create d3 graph model from graph data
         const {graph} = this.props;
-        console.log(graph)
+
         const root = hierarchy(graph)
-        console.log(`root: ${root}`)
+
         //create references links and nodes
         const nodeData = root.descendants().filter((node) => {
             return node.data.show
@@ -68,13 +72,12 @@ class TaxonomyTree extends React.Component {
         console.log(`maxNodeDepth: ${maxNodeDepth}\nmaxNodeChildren: ${maxNodeChildren}`)
         //generate tree
         const treeLayout = tree()
-            .size([maxNodeChildren * 150, maxNodeDepth * 500]);
+            .size([nodeData.length * 150, maxNodeDepth * 500])
+            //.nodeSize([64, 250])
         treeLayout(root);
-        // console.log(nodeData)
-        // console.log(linkData)
 
         d3.select('div.taxonomy-tree-container')
-            .attr('style', `width:${(maxNodeDepth * 800) + 100}px;height:${(maxNodeChildren * 175) + 100}px;`)
+            .attr('style', `width:${(maxNodeDepth * 800) + 100}px;height:${(nodeData.length * 175) + 100}px;`)
         //nodes
 
         const nodes = d3.select("g.nodes")          
@@ -123,19 +126,41 @@ class TaxonomyTree extends React.Component {
         // nodeEnter.append("text")
         //     .attr("class", "rank")
         //     .text(d => `${taxaRanks[d.data.rank]}`);
-        nodeEnter.filter(this.nodeHasHiddenChildren)
-            .append('circle')
+
+        //append expand children button
+
+        const nodesWithHiddenChildren = nodeEnter.filter(this.nodeHasHiddenChildren);
+
+        
+        nodesWithHiddenChildren.append('circle')
             .attr("r", "15")
-            .attr("class", "show-children-button")
+            .attr("class", "show-button show-children")
             .on("click", (d) => {
                 this.props.onShowChildren(d.data)
             })
-
-        nodeEnter.filter(this.nodeHasHiddenChildren)
+        
+        nodesWithHiddenChildren
             .append('text')
-            .attr('class', 'show-children-text')
+            .attr('class', 'show-text show-children')
             .text('+')
         
+        //append expand parent button
+
+        const rootNodeWithParent = nodeEnter.filter(this.nodeIsRootAndHasParent)
+
+        rootNodeWithParent
+            .append('circle')
+            .attr("r", "15")
+            .attr("class", "show-button show-parent")
+            .on("click", (d) => {
+                this.props.onNewRoot(d.data)
+            })
+        
+        rootNodeWithParent
+            .append('text')
+            .attr('class', "show-text show-parent")
+            .text('+')
+
         //lines connecting nodes
         d3.select("g.links")
             .selectAll("path.link")
