@@ -5,6 +5,8 @@ import PaleodbClientService from '../../services/paleodbClient.service';
 import SearchBar from '../search-bar/search-bar.component';
 import TaxonomyTree from '../taxonomy-tree/taxonomy-tree.component';
 
+import {Taxa, taxaFactory} from '../../models/taxa';
+
 const pdbClient = new PaleodbClientService();
 
 class Main extends React.Component {
@@ -12,82 +14,127 @@ class Main extends React.Component {
         super();
         this.state = {
             selectedNode:{},
-            graph:null
+            nodes: []
         }
     }
 
-    handleNodeSelect = (node) => {
-       const _node = this.restructureNodes(node);
-       this.fetchChildNodes(_node).then((children) => {
-            const _children = this.restructureNodes(children);
-            const graph = this.createGraph(_node, _children);
-            this.setState({
-                graph: graph,
-                selectedNode: node
-            });
-       })
-    }
+    handleNodeSelect = (node, resetNodes) => {
+        const {selectedNode} = this.state;
+        const _node = taxaFactory(node);
 
-    fetchChildNodes = (parent) => {
-        return pdbClient.getTaxaAllChildren(parent.id, 2).then((data) => {
-            const records = data.records;
-            const parentIndex = records.findIndex(r => r.oid == parent.oid);
-            
-            records.splice(parentIndex, 1);
-            return records;
+        this.fetchChildNodes(_node).then((children) => {
+                const _children = this.prepareChildNodes(_node, children)
+                let nodes = [..._children, _node];
+
+                this.setState((prevState) => {
+                    if(!resetNodes){
+                        const nodesDeduplicated = nodes.filter((childNode) => {
+                            return (childNode.parent != selectedNode._id ) && (childNode._id != selectedNode._id)
+                        })
+                        nodes = [...nodesDeduplicated, ...prevState.nodes]
+                    }
+                    return {
+                        nodes: nodes,
+                        selectedNode: _node
+                    }
+                });
         })
     }
 
-    restructureNodes = (records) => {
-        const imgURL = `https://paleobiodb.org/data1.2/taxa/thumb.png?id=`
-        if (Array.isArray(records)) {
-            return records.map((record) => {
-                return ({
-                    id: record.oid,
-                    name: record.nam,
-                    rank: record.rnk,
-                    parent: record.par,
-                    children: [],
-                    img: `${imgURL}${record.img.split(':')[1]}`
-                })
-            })
-        } else if (records.id){
-            return records
-        } else {
-            return ({
-                id: records.oid,
-                name: records.nam,
-                rank: records.rnk,
-                parent: records.par,
-                children: [],
-                img: `${imgURL}${records.img.split(':')[1]}`
-            })
-        }
+    handleNewRoot = (node) => {
+        pdbClient.getTaxaByOID(node.parent).then((data) => {
+            const parent = data.records[0]
+            this.handleNodeSelect(parent)
+        })
     }
 
-    createGraph = (root, records) => {
-        const graph = root;
-        if (records.length < 1){
-            return graph;
-        }
+    handleShowChildren = (parent) => {
+       this.fetchChildNodes(parent).then((children) => {
+           const _children = this.prepareChildNodes(parent, children)
+            this.setState((prevState) => {
+                const updatedNodes = [...prevState.nodes];
+                const updatedNodesDeduplicated = updatedNodes.filter((node) => {
+                    return node.parent != parent._id
+                })
+                const nodes = [...updatedNodesDeduplicated, ..._children];
+                return {nodes: nodes}
+            })
+       })
+    }
 
-        //else we have more work to do. Find children of this node
-        for (let i = 0; i < records.length; i++) {
-            let record = records[i];
+    handleHideChildren = (parent) => {
+        //console.log('handleHideChildrenCalled with Parent:' + JSON.stringify(parent))
+        this.setState((prevState) => {
+            const _nodes = [...prevState.nodes]
+            this.hideAllDecendants(parent, _nodes);
+            return {nodes: _nodes}
+        })
+    }
 
-            if (record.parent == root.id){
-                graph.children.push(record) 
-                records.splice(i,1); //reduce search field
-                record = this.createGraph(record, records);
+    hideAllDecendants = (parent, nodes) => {
+       nodes.forEach((node, i, arr) => {
+            if (node.parent == parent._id) {
+                node.show = false
+                arr[i] = node;
+                this.hideAllDecendants(node, nodes)
             }
-            
-        }
+        })
+    }
 
-        return graph;
+    //grab 1 extra child depth that will be hidden
+    fetchChildNodes = (parent, depth) => {
+        return pdbClient.getTaxaAllChildren(parent._id, 2).then((data) => {
+            const records = data.records;
+            //filter out parent which is already known
+            const parentIndex = records.findIndex(r => r.oid == parent._id);        
+            records.splice(parentIndex, 1);
+            const _records = records.filter((record) => { //filter out subjective synonyms
+                return !record.tdf
+            })
+            return _records;
+        })
+    }
+
+    //create Taxa objects out of records and hide children that are
+    prepareChildNodes = (parent, children) => {
+        const {selectedNode} = this.state
+        const _children = taxaFactory(children);
+        return _children.map((child) => {
+            if (child.parent == parent._id || child._id == selectedNode._id || child.parent == selectedNode._id){
+                child.show = true;
+                return child;
+            } else {
+                child.show = false;
+                return child;
+            }
+        })
+    }
+    
+
+    createHierarchicalGraph = (root, nodes) => {
+        console.log(root)
+        let _root = Object.assign({}, root);
+        const _nodes = [...nodes];
+
+        _root = this.findChildren(_root, _nodes);
+        return _root;
+    }
+
+    findChildren = (root, nodes) => {
+        root.children=[];
+        for (let i = 0; i < nodes.length; i++) {
+            let node = Object.assign({},nodes[i]);
+            node.children = []
+            if (node.parent == root._id && node._id != root._id){
+                let child = this.findChildren(node, nodes);
+                root.children.push(child)
+            }
+        }
+        return root;
     }
 
     render(){
-        const {graph, selectedNode} = this.state;
+        const {nodes, selectedNode} = this.state;
         return(
             <div className="main">
                 <div className="layout-container header">
@@ -101,8 +148,11 @@ class Main extends React.Component {
                 <div>
                     <TaxonomyTree
                         onNodeClick={this.handleNodeSelect}
+                        onNewRoot={this.handleNewRoot}
+                        onShowChildren={this.handleShowChildren}
+                        onHideChildren={this.handleHideChildren}
                         selectedNode={selectedNode}
-                        graph={graph}
+                        graph={this.createHierarchicalGraph(selectedNode, nodes)}
                     />
                 </div>
             </div>

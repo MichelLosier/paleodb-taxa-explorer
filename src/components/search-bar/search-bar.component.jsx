@@ -32,7 +32,7 @@ class SearchBar extends React.Component {
             value: '',
             searchResults:[]
         })
-        this.props.onRecordSelect(record);
+        this.props.onRecordSelect(record, true);
     }
 
 

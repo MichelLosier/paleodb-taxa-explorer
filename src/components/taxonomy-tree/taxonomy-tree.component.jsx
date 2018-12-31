@@ -29,6 +29,34 @@ class TaxonomyTree extends React.Component {
         }
     }
 
+    nodeHasHiddenChildren(node){
+        let children = node.data.children;
+        let childrenLen = children.length
+        let allChildrenHidden = () => {
+            let visibleChildren = children.filter((child) => {
+                return child.show
+            })
+            return visibleChildren.length == 0;
+        }
+        return( childrenLen  > 0 && allChildrenHidden())
+    }
+
+    nodeHasVisibleChildren(node){
+        let children = node.data.children;
+        let childrenLen = children.length
+        let allChildrenHidden = () => {
+            let visibleChildren = children.filter((child) => {
+                return child.show
+            })
+            return visibleChildren.length != 0;
+        }
+        return( childrenLen  > 0 && allChildrenHidden())
+    }
+
+    nodeIsRootAndHasParent = (node) => {
+        return node.data.parent && (node.data._id == this.props.selectedNode._id)
+    }
+
     createTree = () => {
         const labelBoxWidth = 204
         const labelBoxHeight = 54;
@@ -40,24 +68,28 @@ class TaxonomyTree extends React.Component {
 
         //create d3 graph model from graph data
         const {graph} = this.props;
+
         const root = hierarchy(graph)
-        
+
         //create references links and nodes
-        const nodeData = root.descendants();
-        const linkData = root.links();
+        const nodeData = root.descendants().filter((node) => {
+            return node.data.show
+        });
+        const linkData = root.links().filter((link) => {
+            return link.target.data.show
+        });
 
         const maxNodeDepth = this.findMaxOfProperty('depth', nodeData)
         const maxNodeChildren = this.findMaxOfProperty('children', nodeData)
         console.log(`maxNodeDepth: ${maxNodeDepth}\nmaxNodeChildren: ${maxNodeChildren}`)
         //generate tree
         const treeLayout = tree()
-            .size([maxNodeChildren * 150, maxNodeDepth * 500]);
+            .size([nodeData.length * 150, maxNodeDepth * 600])
+            //.nodeSize([64, 250])
         treeLayout(root);
-        console.log(nodeData)
-        console.log(linkData)
 
         d3.select('div.taxonomy-tree-container')
-            .attr('style', `width:${(maxNodeDepth * 800) + 100}px;height:${(maxNodeChildren * 175) + 100}px;`)
+            .attr('style', `width:${(maxNodeDepth * 800) + 400}px;height:${(nodeData.length * 175) + 100}px;`)
         //nodes
 
         const nodes = d3.select("g.nodes")          
@@ -107,8 +139,54 @@ class TaxonomyTree extends React.Component {
         //     .attr("class", "rank")
         //     .text(d => `${taxaRanks[d.data.rank]}`);
 
+        //append expand children button
+
+        const nodesWithHiddenChildren = nodeEnter.filter(this.nodeHasHiddenChildren);
 
         
+        nodesWithHiddenChildren.append('circle')
+            .attr("r", "15")
+            .attr("class", "show-button show-children")
+            .on("click", (d) => {
+                this.props.onShowChildren(d.data)
+            })
+        
+        nodesWithHiddenChildren
+            .append('text')
+            .attr('class', 'show-text show-children')
+            .text('+')
+        
+        const nodesWithVisibleChildren = nodeEnter.filter(this.nodeHasVisibleChildren)
+
+        nodesWithVisibleChildren.append('circle')
+        .attr("r", "15")
+        .attr("class", "show-button show-children")
+        .on("click", (d) => {
+            this.props.onHideChildren(d.data)
+        })
+    
+        nodesWithVisibleChildren
+            .append('text')
+            .attr('class', 'show-text hide-children')
+            .text('-')
+
+        //append expand parent button
+
+        const rootNodeWithParent = nodeEnter.filter(this.nodeIsRootAndHasParent)
+
+        rootNodeWithParent
+            .append('circle')
+            .attr("r", "15")
+            .attr("class", "show-button show-parent")
+            .on("click", (d) => {
+                this.props.onNewRoot(d.data)
+            })
+        
+        rootNodeWithParent
+            .append('text')
+            .attr('class', "show-text show-parent")
+            .text('+')
+
         //lines connecting nodes
         d3.select("g.links")
             .selectAll("path.link")

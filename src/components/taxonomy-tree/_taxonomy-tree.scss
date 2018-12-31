@@ -7,7 +7,7 @@
         height:inherit;
         width:inherit;
         g#tree-group{
-            transform: translate(100px,100px);
+            transform: translate(140px,100px);
         }
         g.node{
             fill: white;
@@ -23,6 +23,33 @@
                 height: 44px;
                 width: 44px;
                 transform: translate(5px, -22px)
+            }
+            .show-button{
+                fill: white;
+                stroke: $color-primary-grey;
+                cursor:pointer;
+                &.show-children{
+                    transform: translate(224px, 0px);
+                }
+                &.show-parent{
+                    transform: translate(-20px, 0px);
+                }
+            }
+            text.show-text {
+                fill: $color-primary-grey;
+                stroke-width: 0.1;
+                font-size: 24px;
+                pointer-events: none;
+                &.show-children{
+                    transform: translate(216.25px, 6px);
+                }
+                &.show-parent{
+                    transform: translate(-27.75px, 6px);
+                }
+                &.hide-children{
+                    font-size:30px;
+                    transform: translate(219px, 8px);
+                }
             }
             .label-svg-container{
                 width: 150px;

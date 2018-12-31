@@ -72,7 +72,7 @@ a {
   height: inherit;
   width: inherit; }
   .taxonomy-tree-container svg#taxonomy-tree g#tree-group {
-    transform: translate(100px, 100px); }
+    transform: translate(140px, 100px); }
   .taxonomy-tree-container svg#taxonomy-tree g.node {
     fill: white;
     stroke: #666; }
@@ -86,6 +86,26 @@ a {
       height: 44px;
       width: 44px;
       transform: translate(5px, -22px); }
+    .taxonomy-tree-container svg#taxonomy-tree g.node .show-button {
+      fill: white;
+      stroke: #666;
+      cursor: pointer; }
+      .taxonomy-tree-container svg#taxonomy-tree g.node .show-button.show-children {
+        transform: translate(224px, 0px); }
+      .taxonomy-tree-container svg#taxonomy-tree g.node .show-button.show-parent {
+        transform: translate(-20px, 0px); }
+    .taxonomy-tree-container svg#taxonomy-tree g.node text.show-text {
+      fill: #666;
+      stroke-width: 0.1;
+      font-size: 24px;
+      pointer-events: none; }
+      .taxonomy-tree-container svg#taxonomy-tree g.node text.show-text.show-children {
+        transform: translate(216.25px, 6px); }
+      .taxonomy-tree-container svg#taxonomy-tree g.node text.show-text.show-parent {
+        transform: translate(-27.75px, 6px); }
+      .taxonomy-tree-container svg#taxonomy-tree g.node text.show-text.hide-children {
+        font-size: 30px;
+        transform: translate(219px, 8px); }
     .taxonomy-tree-container svg#taxonomy-tree g.node .label-svg-container {
       width: 150px;
       height: 54px;
