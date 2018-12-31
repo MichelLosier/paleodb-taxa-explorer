@@ -62,6 +62,25 @@ class Main extends React.Component {
        })
     }
 
+    handleHideChildren = (parent) => {
+        //console.log('handleHideChildrenCalled with Parent:' + JSON.stringify(parent))
+        this.setState((prevState) => {
+            const _nodes = [...prevState.nodes]
+            this.hideAllDecendants(parent, _nodes);
+            return {nodes: _nodes}
+        })
+    }
+
+    hideAllDecendants = (parent, nodes) => {
+       nodes.forEach((node, i, arr) => {
+            if (node.parent == parent._id) {
+                node.show = false
+                arr[i] = node;
+                this.hideAllDecendants(node, nodes)
+            }
+        })
+    }
+
     //grab 1 extra child depth that will be hidden
     fetchChildNodes = (parent, depth) => {
         return pdbClient.getTaxaAllChildren(parent._id, 2).then((data) => {
@@ -131,6 +150,7 @@ class Main extends React.Component {
                         onNodeClick={this.handleNodeSelect}
                         onNewRoot={this.handleNewRoot}
                         onShowChildren={this.handleShowChildren}
+                        onHideChildren={this.handleHideChildren}
                         selectedNode={selectedNode}
                         graph={this.createHierarchicalGraph(selectedNode, nodes)}
                     />

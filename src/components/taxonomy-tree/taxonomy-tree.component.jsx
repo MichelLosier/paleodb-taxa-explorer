@@ -41,6 +41,18 @@ class TaxonomyTree extends React.Component {
         return( childrenLen  > 0 && allChildrenHidden())
     }
 
+    nodeHasVisibleChildren(node){
+        let children = node.data.children;
+        let childrenLen = children.length
+        let allChildrenHidden = () => {
+            let visibleChildren = children.filter((child) => {
+                return child.show
+            })
+            return visibleChildren.length != 0;
+        }
+        return( childrenLen  > 0 && allChildrenHidden())
+    }
+
     nodeIsRootAndHasParent = (node) => {
         return node.data.parent && (node.data._id == this.props.selectedNode._id)
     }
@@ -72,12 +84,12 @@ class TaxonomyTree extends React.Component {
         console.log(`maxNodeDepth: ${maxNodeDepth}\nmaxNodeChildren: ${maxNodeChildren}`)
         //generate tree
         const treeLayout = tree()
-            .size([nodeData.length * 150, maxNodeDepth * 500])
+            .size([nodeData.length * 150, maxNodeDepth * 600])
             //.nodeSize([64, 250])
         treeLayout(root);
 
         d3.select('div.taxonomy-tree-container')
-            .attr('style', `width:${(maxNodeDepth * 800) + 100}px;height:${(nodeData.length * 175) + 100}px;`)
+            .attr('style', `width:${(maxNodeDepth * 800) + 400}px;height:${(nodeData.length * 175) + 100}px;`)
         //nodes
 
         const nodes = d3.select("g.nodes")          
@@ -144,6 +156,20 @@ class TaxonomyTree extends React.Component {
             .attr('class', 'show-text show-children')
             .text('+')
         
+        const nodesWithVisibleChildren = nodeEnter.filter(this.nodeHasVisibleChildren)
+
+        nodesWithVisibleChildren.append('circle')
+        .attr("r", "15")
+        .attr("class", "show-button show-children")
+        .on("click", (d) => {
+            this.props.onHideChildren(d.data)
+        })
+    
+        nodesWithVisibleChildren
+            .append('text')
+            .attr('class', 'show-text hide-children')
+            .text('-')
+
         //append expand parent button
 
         const rootNodeWithParent = nodeEnter.filter(this.nodeIsRootAndHasParent)

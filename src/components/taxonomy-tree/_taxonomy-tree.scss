@@ -46,6 +46,10 @@
                 &.show-parent{
                     transform: translate(-27.75px, 6px);
                 }
+                &.hide-children{
+                    font-size:30px;
+                    transform: translate(219px, 8px);
+                }
             }
             .label-svg-container{
                 width: 150px;
