@@ -5,6 +5,7 @@ import {linkHorizontal} from 'd3-shape';
 import {tree, hierarchy} from 'd3-hierarchy';
 import * as d3 from 'd3';
 
+import {deepCopy} from '../../helpers';
 import {taxaRanks} from '../../constants/taxaRank.constants';
 
 class TaxonomyTree extends React.Component {
@@ -16,18 +17,38 @@ class TaxonomyTree extends React.Component {
         graph: null
     }
 
-    componentDidMount(){
-        if (this.props.graph != null) {
-            this.createTree();
-        }
-        
-    }
 
     componentDidUpdate(){
-        if (this.props.graph != null) {
-            this.createTree();
+        if (this.props.graph.length > 0) {
+            const {selectedNode, graph} = this.props;
+            const hierarchicalGraph = this.createHierarchicalGraph(selectedNode, graph);
+            this.createTree(hierarchicalGraph);
         }
     }
+
+
+    createHierarchicalGraph = (root, nodes) => {
+        let _root = deepCopy(root);
+        const _nodes = deepCopy(nodes);
+
+        _root = this.findChildren(_root, _nodes);
+        return _root;
+    }
+
+    findChildren = (root, nodes) => {
+        root.children=[];
+        for (let i = 0; i < nodes.length; i++) {
+            let node = deepCopy(nodes[i]);
+            node.children = []
+            if (node.parent == root._id && node._id != root._id){
+                let child = this.findChildren(node, nodes);
+                root.children.push(child)
+            }
+        }
+        return root;
+    }
+
+
 
     nodeHasHiddenChildren(node){
         let children = node.data.children;
@@ -57,7 +78,7 @@ class TaxonomyTree extends React.Component {
         return node.data.parent && (node.data._id == this.props.selectedNode._id)
     }
 
-    createTree = () => {
+    createTree = (graph) => {
         const labelBoxWidth = 204
         const labelBoxHeight = 54;
 
@@ -67,29 +88,33 @@ class TaxonomyTree extends React.Component {
         d3.selectAll("path.link").remove()
 
         //create d3 graph model from graph data
-        const {graph} = this.props;
-
-        const root = hierarchy(graph)
-
+        console.log(graph)
+ 
+        const root = hierarchy(graph);
         //create references links and nodes
-        const nodeData = root.descendants().filter((node) => {
+        const nodeData = root.descendants()
+            .filter((node) => {
             return node.data.show
         });
-        const linkData = root.links().filter((link) => {
+    
+        const linkData = root.links()
+            .filter((link) => {
             return link.target.data.show
         });
 
-        const maxNodeDepth = this.findMaxOfProperty('depth', nodeData)
-        const maxNodeChildren = this.findMaxOfProperty('children', nodeData)
+        console.log(root);
+        const maxNodeDepth = this.findMaxOfProperty('depth', root.descendants())
+        const maxNodeChildren = this.findMaxOfProperty('children', root.descendants())
         console.log(`maxNodeDepth: ${maxNodeDepth}\nmaxNodeChildren: ${maxNodeChildren}`)
         //generate tree
         const treeLayout = tree()
-            .size([nodeData.length * 150, maxNodeDepth * 600])
+            .size([root.descendants().length * 80, maxNodeDepth * 600])
+            console.log(`nodeData.length: ${root.descendants().length}, maxNodeDepth: ${maxNodeDepth}`)
             //.nodeSize([64, 250])
         treeLayout(root);
 
         d3.select('div.taxonomy-tree-container')
-            .attr('style', `width:${(maxNodeDepth * 800) + 400}px;height:${(nodeData.length * 175) + 100}px;`)
+            .attr('style', `width:${(maxNodeDepth * 800) + 400}px;height:${(root.descendants().length * 175) + 100}px;`)
         //nodes
 
         const nodes = d3.select("g.nodes")          
