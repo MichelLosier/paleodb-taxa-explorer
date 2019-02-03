@@ -6,6 +6,7 @@ import SearchBar from '../search-bar/search-bar.component';
 import TaxonomyTree from '../taxonomy-tree/taxonomy-tree.component';
 
 import {Taxa, taxaFactory} from '../../models/taxa';
+import {deepCopy} from '../../helpers';
 
 const pdbClient = new PaleodbClientService();
 
@@ -65,7 +66,7 @@ class Main extends React.Component {
     handleHideChildren = (parent) => {
         //console.log('handleHideChildrenCalled with Parent:' + JSON.stringify(parent))
         this.setState((prevState) => {
-            const _nodes = [...prevState.nodes]
+            const _nodes = [...prevState.nodes];
             this.hideAllDecendants(parent, _nodes);
             return {nodes: _nodes}
         })
@@ -111,27 +112,6 @@ class Main extends React.Component {
     }
     
 
-    createHierarchicalGraph = (root, nodes) => {
-        console.log(root)
-        let _root = Object.assign({}, root);
-        const _nodes = [...nodes];
-
-        _root = this.findChildren(_root, _nodes);
-        return _root;
-    }
-
-    findChildren = (root, nodes) => {
-        root.children=[];
-        for (let i = 0; i < nodes.length; i++) {
-            let node = Object.assign({},nodes[i]);
-            node.children = []
-            if (node.parent == root._id && node._id != root._id){
-                let child = this.findChildren(node, nodes);
-                root.children.push(child)
-            }
-        }
-        return root;
-    }
 
     render(){
         const {nodes, selectedNode} = this.state;
@@ -151,8 +131,8 @@ class Main extends React.Component {
                         onNewRoot={this.handleNewRoot}
                         onShowChildren={this.handleShowChildren}
                         onHideChildren={this.handleHideChildren}
-                        selectedNode={selectedNode}
-                        graph={this.createHierarchicalGraph(selectedNode, nodes)}
+                        selectedNode={deepCopy(selectedNode)}
+                        graph={deepCopy(nodes)}
                     />
                 </div>
             </div>
