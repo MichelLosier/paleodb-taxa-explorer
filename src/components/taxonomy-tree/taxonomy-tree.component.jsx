@@ -28,15 +28,19 @@ class TaxonomyTree extends React.Component {
 
 
     createHierarchicalGraph = (root, nodes) => {
+        //make value copies of nodes so we are not mutating state
         let _root = deepCopy(root);
         const _nodes = deepCopy(nodes);
 
+        //set children of root node - this builds our graph hierarchically
         _root = this.findChildren(_root, _nodes);
         return _root;
     }
 
+    //recursively find child nodes
     findChildren = (root, nodes) => {
         root.children=[];
+
         for (let i = 0; i < nodes.length; i++) {
             let node = deepCopy(nodes[i]);
             node.children = []
@@ -86,6 +90,7 @@ class TaxonomyTree extends React.Component {
         //reset tree on component update
         d3.selectAll("g.node").remove()
         d3.selectAll("path.link").remove()
+
 
         //create d3 graph model from graph data
         console.log(graph)
@@ -256,7 +261,7 @@ class TaxonomyTree extends React.Component {
 
 TaxonomyTree.propTypes = {
     //graph of nodes
-    graph: PropTypes.object,
+    graph: PropTypes.array,
     //handler for when a node is clicked
     onNodeClick: PropTypes.func,
     //handler to expand tree from node
