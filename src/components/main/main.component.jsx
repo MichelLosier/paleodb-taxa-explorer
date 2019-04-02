@@ -1,14 +1,17 @@
 import React from 'react';
 
 import PaleodbClientService from '../../services/paleodbClient.service';
+import WikiClientService from '../../services/wikiClient.service';
 
 import SearchBar from '../search-bar/search-bar.component';
+import WikiArticle from '../wiki-article/wiki-article.component';
 import TaxonomyTree from '../taxonomy-tree/taxonomy-tree.component';
 
 import {Taxa, taxaFactory} from '../../models/taxa';
 import {deepCopy} from '../../helpers';
 
 const pdbClient = new PaleodbClientService();
+const wikiClient = new WikiClientService();
 
 class Main extends React.Component {
     constructor(){
@@ -123,6 +126,12 @@ class Main extends React.Component {
                 <div className="layout-container">
                     <SearchBar
                         onRecordSelect={this.handleNodeSelect}
+                    />
+                </div>
+                <div>
+                    <WikiArticle
+                        taxonId={selectedNode._id}
+                        wikiClient={wikiClient}
                     />
                 </div>
                 <div>
