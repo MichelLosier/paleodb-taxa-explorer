@@ -24,8 +24,8 @@ class WikiArticle extends React.Component{
 
         if(taxonId){
             const fossilWorksId = taxonId.split(':')[1]
-            wikiClient.getWikiHTMLByFossilWorksId(fossilWorksId).then((html) => {
-                this.setState({articleHTML: html});
+            wikiClient.getWikiHTMLByFossilWorksId(fossilWorksId).then((data) => {
+                this.setState({articleHTML: JSON.stringify(data)});
             })
         }
     }

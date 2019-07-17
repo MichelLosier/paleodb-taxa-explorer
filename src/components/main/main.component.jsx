@@ -129,10 +129,10 @@ class Main extends React.Component {
                     />
                 </div>
                 <div>
-                    <WikiArticle
+                    {/* <WikiArticle
                         taxonId={selectedNode._id}
                         wikiClient={wikiClient}
-                    />
+                    /> */}
                 </div>
                 <div>
                     <TaxonomyTree

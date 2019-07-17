@@ -3,28 +3,33 @@ import {http} from './clientHelpers';
 class WikiClientService{
     constructor(){
         this.baseWikiDataURL = 'https://query.wikidata.org/sparql?query='
-        this.baseWikiURL = 'https://en.wikipedia.org/api/rest_v1/'
+        this.baseWikiURL = 'https://en.wikipedia.org/w/api.php'
 
-        this.baseHeaders = new Headers({
-            'Accept': 'application/json'
-        })
+        this.baseHeaders = {
+            'Accept': 'application/json',
+        }
     }
 
-    baseRequest = (baseURL, params) => {
+    baseRequest = (baseURL, params, headers) => {
+        if (!headers) {
+            headers = {}
+        }
         const request = new Request(`${baseURL}${params}`, {
             method: 'GET',
-            headers: this.baseHeaders
+            mode: 'cors',
+            headers: new Headers(Object.assign(this.baseHeaders, headers))
         })
         return http(request).then((data)=>{
             return data;
+        }).then((data) => {
+            return data.json();
+        }).catch((error) => {
+            console.log(error)
         })
     }
 
     getWikiHTMLByFossilWorksId = (id) => {
         return this.getWikiPageLinkByFossilWorksId(id)
-        .then((response) => {
-            return response.json()
-        })
         .then((data) => {
             return this.getWikiPageTitleFromSPARQLresponse(data)
         })
@@ -32,7 +37,7 @@ class WikiClientService{
             if(!pageTitle){
                 return "No Wiki Article"
             }
-            return this.getWikiPageHTMLByTitle(pageTitle)
+            return this.getWikiPageContentByTitle(pageTitle)
         })
     }
 
@@ -59,14 +64,13 @@ class WikiClientService{
         return uri.substring(lastSegment+1)
     }
 
-    getWikiPageHTMLByTitle = (pageTitle) => {
-        const endpoint = `page/html/${pageTitle}`
-       return this.baseRequest(this.baseWikiURL, endpoint)
-        .then((response) => {
-            return response.text()
-        })
+    getWikiPageContentByTitle = (pageTitle) => {
+        const headers = {
+            'Content-Type': 'application/json',
+        }
+        const params = `?action=query&titles=${pageTitle}&format=json&origin=*&prop=extracts&exintro=1`
+        return this.baseRequest(this.baseWikiURL, params, headers)
     }
-
 }
 
 export default WikiClientService;
