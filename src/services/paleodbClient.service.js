@@ -17,7 +17,7 @@ class PaleodbClientService{
            // headers: this.baseGetHeaders
         })
         return http(request).then((data)=>{
-            return data;
+            return data.json();
         })
     }
 
