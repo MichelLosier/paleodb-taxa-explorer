@@ -39,10 +39,16 @@ class TaxonomyTree extends React.Component {
         root.children=[];
         for (let i = 0; i < nodes.length; i++) {
             let node = deepCopy(nodes[i]);
-            node.children = []
+            node.children = [];
+            node.hiddenChildren = [];
             if (node.parent == root._id && node._id != root._id){
                 let child = this.findChildren(node, nodes);
-                root.children.push(child)
+                if (child.show){
+                    root.children.push(child)
+                } else {
+                    root.hiddenChildren.push(child)
+                }
+                
             }
         }
         return root;
@@ -51,27 +57,11 @@ class TaxonomyTree extends React.Component {
 
 
     nodeHasHiddenChildren(node){
-        let children = node.data.children;
-        let childrenLen = children.length
-        let allChildrenHidden = () => {
-            let visibleChildren = children.filter((child) => {
-                return child.show
-            })
-            return visibleChildren.length == 0;
-        }
-        return( childrenLen  > 0 && allChildrenHidden())
+        return node.data.hiddenChildren.length > 0
     }
 
     nodeHasVisibleChildren(node){
-        let children = node.data.children;
-        let childrenLen = children.length
-        let allChildrenHidden = () => {
-            let visibleChildren = children.filter((child) => {
-                return child.show
-            })
-            return visibleChildren.length != 0;
-        }
-        return( childrenLen  > 0 && allChildrenHidden())
+        return node.data.children.length > 0
     }
 
     nodeIsRootAndHasParent = (node) => {

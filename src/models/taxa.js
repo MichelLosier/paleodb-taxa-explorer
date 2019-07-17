@@ -7,6 +7,7 @@ export class Taxa {
         this.rank = rank
         this.parent = parent
         this.children = [],
+        this.hiddenChildren = [],
         this.img = `${imgURL}${img.split(':')[1]}`
         this.show = true;
     }
